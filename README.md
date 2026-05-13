@@ -1,8 +1,88 @@
-# iso27001-controls-to-reality
-**ISO 27001 Controls to Reality**
+# ISO 27001 Controls to Reality
 
-This repository transforms ISO/IEC 27001:2022 controls from theoretical requirements into practical, real-world implementations. While most resources focus on what the standard says, this project focuses on how organisations can actually implement, evidence, automate, and operationalise each control in environments like Microsoft 365, Azure, Windows, and typical corporate networks.
+Practical implementation guidance for translating ISO/IEC 27001:2022 Annex A controls into technical actions, evidence, and audit-ready operating routines across Microsoft 365, Azure, Windows, and typical corporate environments.
 
-Each Annex A control group contains guides, templates, examples, and configuration notes that help bridge the gap between governance-level requirements and technical enforcement. Whether you're a consultant, security engineer, or internal auditor, you will find actionable guidance here.
+## Why this exists
 
-Mappings to NIST CSF, CIS Controls, and cloud shared-responsibility models are also included to support framework consolidation and compliance reporting. Contributions are encouraged — especially real-world implementations, diagrams, scripts, and checklists.
+Many ISO 27001 resources explain what the control expects, but not how a security team can prove the control is working. This repository bridges that gap by mapping governance requirements to technical implementation patterns, administrator tasks, evidence examples, and audit preparation artefacts.
+
+Use this repository when you need to:
+
+- Convert high-level Annex A control language into real implementation actions.
+- Build a reusable evidence pack for internal audit, external audit, client assurance, or certification readiness.
+- Align security operations, Microsoft 365 hardening, Azure monitoring, endpoint controls, and policy governance to ISO 27001 outcomes.
+- Create a repeatable control-owner workflow for evidence collection and remediation tracking.
+
+## Who this is for
+
+- Information security and GRC teams
+- Security consultants
+- Internal auditors
+- IT administrators responsible for ISO 27001 control implementation
+- Small and medium organisations building an ISMS for the first time
+
+## Repository structure
+
+```text
+.
+├── README.md
+├── CONTRIBUTING.md
+├── CHANGELOG.md
+├── LICENSE
+└── docs/
+    ├── control-mapping-matrix.csv
+    ├── evidence-collection-guide.md
+    ├── statement-of-applicability-template.md
+    └── audit-readiness-checklist.md
+```
+
+## Quick start
+
+1. Start with [`docs/control-mapping-matrix.csv`](docs/control-mapping-matrix.csv).
+2. Filter by the control owner, technology area, or implementation status.
+3. Use [`docs/evidence-collection-guide.md`](docs/evidence-collection-guide.md) to collect screenshots, exports, logs, policy documents, and ticket references.
+4. Copy [`docs/statement-of-applicability-template.md`](docs/statement-of-applicability-template.md) into your ISMS evidence folder and complete the applicability and justification fields.
+5. Run through [`docs/audit-readiness-checklist.md`](docs/audit-readiness-checklist.md) before internal audit, stage 1, stage 2, or surveillance audit activity.
+
+## Suggested evidence naming convention
+
+```text
+YYYY-MM-DD_CONTROL-ID_SYSTEM_EVIDENCE-TYPE_OWNER_VERSION.ext
+```
+
+Example:
+
+```text
+2026-05-13_A.8.15_M365-AuditLogs_ConfigExport_ITSecurity_v1.pdf
+```
+
+## Implementation status model
+
+| Status | Meaning |
+| --- | --- |
+| Not Started | No implementation evidence exists yet. |
+| Designed | Control approach is documented but not fully implemented. |
+| Implemented | Technical control or process is live. |
+| Evidenced | Evidence has been collected and mapped to the control. |
+| Reviewed | Control owner or auditor has reviewed the evidence. |
+| Exception | Risk acceptance, compensating control, or remediation plan is required. |
+
+## Audit-readiness principles
+
+- Every control must have an owner.
+- Every applicable control must have evidence.
+- Every non-applicable control must have a business justification.
+- Every exception must have a risk owner, expiry date, and remediation path.
+- Evidence must be recent enough to support the audit period being reviewed.
+
+## Contributing
+
+Contributions are welcome. Please read [`CONTRIBUTING.md`](CONTRIBUTING.md) before adding new control mappings, evidence examples, scripts, or templates.
+
+## License
+
+This repository is licensed under the MIT License. See [`LICENSE`](LICENSE) for details.
+
+## Disclaimer
+
+This repository is a practical implementation aid and does not replace formal legal, certification, or accredited audit advice. Validate all controls, evidence requirements, and risk decisions against your organisation's ISMS scope, regulatory obligations, contractual requirements, and auditor expectations.
