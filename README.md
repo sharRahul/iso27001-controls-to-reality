@@ -4,7 +4,7 @@ Practical implementation guidance for translating ISO/IEC 27001:2022 Annex A con
 
 ## Why this exists
 
-Many ISO 27001 resources explain what the control expects, but not how a security team can prove the control is working. This repository bridges that gap by mapping governance requirements to technical implementation patterns, administrator tasks, evidence examples, and audit preparation artefacts.
+Many ISO 27001 resources explain what the control expects, but not how a security team can prove the control is working. This repository bridges that gap by mapping governance requirements to technical implementation patterns, administrator tasks, evidence examples, audit preparation artefacts, cross-framework mappings, and lightweight evidence automation.
 
 Use this repository when you need to:
 
@@ -12,6 +12,7 @@ Use this repository when you need to:
 - Build a reusable evidence pack for internal audit, external audit, client assurance, or certification readiness.
 - Align security operations, Microsoft 365 hardening, Azure monitoring, endpoint controls, and policy governance to ISO 27001 outcomes.
 - Create a repeatable control-owner workflow for evidence collection and remediation tracking.
+- Cross-map ISO 27001 controls to NIST CSF 2.0 and Cyber Essentials themes.
 
 ## Who this is for
 
@@ -35,6 +36,9 @@ To improve discoverability, apply the following topics to this repository via th
 ├── CONTRIBUTING.md
 ├── CHANGELOG.md
 ├── LICENSE
+├── .github/
+│   └── workflows/
+│       └── validate-and-dashboard.yml
 ├── docs/
 │   ├── control-mapping-matrix.csv
 │   ├── evidence-collection-guide.md
@@ -45,28 +49,75 @@ To improve discoverability, apply the following topics to this repository via th
 │   ├── controls/
 │   │   ├── A.5.15-access-control.md
 │   │   ├── A.5.16-identity-management.md
+│   │   ├── A.6.3-security-awareness-training.md
+│   │   ├── A.8.2-privileged-access-rights.md
 │   │   ├── A.8.5-secure-authentication.md
 │   │   ├── A.8.7-protection-against-malware.md
 │   │   └── A.8.15-logging-and-monitoring.md
-│   └── isms-policy-templates/
-│       ├── acceptable-use-policy.md
-│       ├── access-control-policy.md
-│       └── incident-response-policy.md
+│   ├── crosswalks/
+│   │   └── iso27001-nist-csf2-cyber-essentials.csv
+│   ├── isms-policy-templates/
+│   │   ├── acceptable-use-policy.md
+│   │   ├── access-control-policy.md
+│   │   └── incident-response-policy.md
+│   ├── policies/
+│   │   ├── access-control-policy-template.md
+│   │   └── incident-response-policy-template.md
+│   └── templates/
+│       └── risk-register-template.csv
 └── scripts/
-    └── Get-ISO27001Evidence.ps1
+    ├── Get-ISO27001Evidence.ps1
+    ├── validate_repository.py
+    └── m365/
+        └── Export-M365Iso27001Evidence.ps1
 ```
 
 ## Quick start
 
-1. Start with [`docs/control-mapping-matrix.csv`](docs/control-mapping-matrix.csv). Filter by control owner, technology area, or implementation status to prioritise your workload.
+1. Start with [`docs/control-mapping-matrix.csv`](docs/control-mapping-matrix.csv). Filter by control owner, technology area, review frequency, related framework mapping, or implementation status to prioritise your workload.
 2. Use [`docs/evidence-collection-guide.md`](docs/evidence-collection-guide.md) to collect screenshots, exports, logs, policy documents, and ticket references.
-3. Copy [`docs/statement-of-applicability-template.md`](docs/statement-of-applicability-template.md) into your ISMS evidence folder and complete the applicability and justification fields.
-4. Run through [`docs/audit-readiness-checklist.md`](docs/audit-readiness-checklist.md) before internal audit, stage 1, stage 2, or surveillance audit activity.
-5. Use [`docs/risk-register-template.md`](docs/risk-register-template.md) to document, score, and track information security risks. The template includes five pre-populated example risks for M365 and cloud-hybrid environments.
-6. Refer to the per-control guides in [`docs/controls/`](docs/controls/) for detailed implementation notes, evidence checklists, and audit questions for individual Annex A controls.
-7. Adapt the policy templates in [`docs/isms-policy-templates/`](docs/isms-policy-templates/) — covering acceptable use, access control, and incident response — to your organisation's context. Each template references the relevant Annex A controls and is ready for document control.
-8. Run [`scripts/Get-ISO27001Evidence.ps1`](scripts/Get-ISO27001Evidence.ps1) in your Microsoft 365 or Azure environment to automate collection of common technical evidence artefacts.
-9. Use [`docs/framework-crosswalk.md`](docs/framework-crosswalk.md) if you are aligning ISO 27001 with NIST CSF 2.0 or Cyber Essentials to identify shared evidence opportunities and avoid duplicated effort.
+3. Refer to the per-control guides in [`docs/controls/`](docs/controls/) for detailed implementation notes, evidence checklists, and audit questions for individual Annex A controls.
+4. Copy [`docs/statement-of-applicability-template.md`](docs/statement-of-applicability-template.md) into your ISMS evidence folder and complete the applicability and justification fields.
+5. Use [`docs/risk-register-template.md`](docs/risk-register-template.md) or [`docs/templates/risk-register-template.csv`](docs/templates/risk-register-template.csv) to document, score, and track information security risks.
+6. Adapt the policy templates in [`docs/isms-policy-templates/`](docs/isms-policy-templates/) or [`docs/policies/`](docs/policies/) to your organisation's context.
+7. Run through [`docs/audit-readiness-checklist.md`](docs/audit-readiness-checklist.md) before internal audit, stage 1, stage 2, or surveillance audit activity.
+8. Use [`docs/framework-crosswalk.md`](docs/framework-crosswalk.md) or [`docs/crosswalks/iso27001-nist-csf2-cyber-essentials.csv`](docs/crosswalks/iso27001-nist-csf2-cyber-essentials.csv) if you are aligning ISO 27001 with NIST CSF 2.0 or Cyber Essentials.
+
+## Automation
+
+### Validate the matrix and generate a dashboard
+
+Run the local validator from the repository root:
+
+```bash
+python scripts/validate_repository.py --dashboard-dir build/control-dashboard
+```
+
+This checks:
+
+- Required CSV columns.
+- ISO 27001 Annex A control ID format.
+- Duplicate control IDs.
+- Supported implementation status values.
+- Crosswalk rows that reference controls not present in the main matrix.
+
+It also generates:
+
+- `build/control-dashboard/control-status-dashboard.md`
+- `build/control-dashboard/control-status-dashboard.html`
+
+The GitHub Actions workflow [`validate-and-dashboard.yml`](.github/workflows/validate-and-dashboard.yml) runs the same validation on push, pull request, and manual dispatch, then uploads the dashboard as a workflow artifact.
+
+### Export Microsoft 365 evidence
+
+Use the read-only Microsoft Graph PowerShell exporter to collect mapped evidence for MFA registration, Conditional Access policies, privileged role assignments, sign-in logs, and directory audit events:
+
+```powershell
+Install-Module Microsoft.Graph -Scope CurrentUser
+./scripts/m365/Export-M365Iso27001Evidence.ps1 -TenantId "<tenant-id-or-domain>" -OutputRoot ./evidence
+```
+
+The script writes CSV/JSON outputs and an `M365_Evidence_Index.csv` file that labels each export with the relevant ISO 27001 control ID. Store exports securely and redact tenant or user details before sharing externally.
 
 ## Suggested evidence naming convention
 
