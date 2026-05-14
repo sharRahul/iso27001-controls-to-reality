@@ -14,10 +14,18 @@ The format follows the spirit of [Keep a Changelog](https://keepachangelog.com/e
 - Statement of Applicability template.
 - Audit readiness checklist.
 - Contribution guidance and MIT licence.
+- ISO 27001 to NIST CSF 2.0 and Cyber Essentials crosswalk CSV.
+- Per-control implementation guides for A.8.2 privileged access rights and A.6.3 security awareness training.
+- Risk register CSV template with starter example risks.
+- Access control and incident response policy templates under `docs/policies/`.
+- Read-only Microsoft 365 / Entra evidence export script with ISO control-labelled evidence index.
+- Python validation and dashboard generator for the control matrix and crosswalk.
+- GitHub Actions workflow that validates repository data and uploads a generated Markdown/HTML control dashboard.
 
 ### Changed
 
 - Expanded README into a professional project storefront with quick start guidance and repository structure.
+- Updated README automation guidance for local validation, generated dashboards, and Microsoft 365 evidence exports.
 
 ## [2025-12-10]
 
