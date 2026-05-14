@@ -21,6 +21,12 @@ Use this repository when you need to:
 - IT administrators responsible for ISO 27001 control implementation
 - Small and medium organisations building an ISMS for the first time
 
+## Suggested GitHub Topics
+
+To improve discoverability, apply the following topics to this repository via the GitHub repository settings:
+
+`iso27001` `iso-27001-2022` `grc` `information-security` `microsoft-365` `azure-security` `annex-a` `isms` `audit-readiness` `compliance`
+
 ## Repository structure
 
 ```text
@@ -29,20 +35,38 @@ Use this repository when you need to:
 ├── CONTRIBUTING.md
 ├── CHANGELOG.md
 ├── LICENSE
-└── docs/
-    ├── control-mapping-matrix.csv
-    ├── evidence-collection-guide.md
-    ├── statement-of-applicability-template.md
-    └── audit-readiness-checklist.md
+├── docs/
+│   ├── control-mapping-matrix.csv
+│   ├── evidence-collection-guide.md
+│   ├── statement-of-applicability-template.md
+│   ├── audit-readiness-checklist.md
+│   ├── risk-register-template.md
+│   ├── framework-crosswalk.md
+│   ├── controls/
+│   │   ├── A.5.15-access-control.md
+│   │   ├── A.5.16-identity-management.md
+│   │   ├── A.8.5-secure-authentication.md
+│   │   ├── A.8.7-protection-against-malware.md
+│   │   └── A.8.15-logging-and-monitoring.md
+│   └── isms-policy-templates/
+│       ├── acceptable-use-policy.md
+│       ├── access-control-policy.md
+│       └── incident-response-policy.md
+└── scripts/
+    └── Get-ISO27001Evidence.ps1
 ```
 
 ## Quick start
 
-1. Start with [`docs/control-mapping-matrix.csv`](docs/control-mapping-matrix.csv).
-2. Filter by the control owner, technology area, or implementation status.
-3. Use [`docs/evidence-collection-guide.md`](docs/evidence-collection-guide.md) to collect screenshots, exports, logs, policy documents, and ticket references.
-4. Copy [`docs/statement-of-applicability-template.md`](docs/statement-of-applicability-template.md) into your ISMS evidence folder and complete the applicability and justification fields.
-5. Run through [`docs/audit-readiness-checklist.md`](docs/audit-readiness-checklist.md) before internal audit, stage 1, stage 2, or surveillance audit activity.
+1. Start with [`docs/control-mapping-matrix.csv`](docs/control-mapping-matrix.csv). Filter by control owner, technology area, or implementation status to prioritise your workload.
+2. Use [`docs/evidence-collection-guide.md`](docs/evidence-collection-guide.md) to collect screenshots, exports, logs, policy documents, and ticket references.
+3. Copy [`docs/statement-of-applicability-template.md`](docs/statement-of-applicability-template.md) into your ISMS evidence folder and complete the applicability and justification fields.
+4. Run through [`docs/audit-readiness-checklist.md`](docs/audit-readiness-checklist.md) before internal audit, stage 1, stage 2, or surveillance audit activity.
+5. Use [`docs/risk-register-template.md`](docs/risk-register-template.md) to document, score, and track information security risks. The template includes five pre-populated example risks for M365 and cloud-hybrid environments.
+6. Refer to the per-control guides in [`docs/controls/`](docs/controls/) for detailed implementation notes, evidence checklists, and audit questions for individual Annex A controls.
+7. Adapt the policy templates in [`docs/isms-policy-templates/`](docs/isms-policy-templates/) — covering acceptable use, access control, and incident response — to your organisation's context. Each template references the relevant Annex A controls and is ready for document control.
+8. Run [`scripts/Get-ISO27001Evidence.ps1`](scripts/Get-ISO27001Evidence.ps1) in your Microsoft 365 or Azure environment to automate collection of common technical evidence artefacts.
+9. Use [`docs/framework-crosswalk.md`](docs/framework-crosswalk.md) if you are aligning ISO 27001 with NIST CSF 2.0 or Cyber Essentials to identify shared evidence opportunities and avoid duplicated effort.
 
 ## Suggested evidence naming convention
 
