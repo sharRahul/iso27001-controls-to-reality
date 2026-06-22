@@ -17,15 +17,19 @@ MATRIX_PATH = REPO_ROOT / "docs" / "control-mapping-matrix.csv"
 CROSSWALK_PATH = REPO_ROOT / "docs" / "crosswalks" / "iso27001-nist-csf2-cyber-essentials.csv"
 
 REQUIRED_MATRIX_COLUMNS = [
-    "Control ID",
-    "Control Title",
-    "Implementation Objective",
-    "Example Technical Action",
-    "Evidence Artefact",
-    "Evidence Owner",
-    "Review Frequency",
-    "Related Framework Mapping",
-    "Implementation Status",
+    "Control_ID",
+    "Control_Name",
+    "Annex_A_Domain",
+    "Technology_Area",
+    "Control_Owner_Role",
+    "Implementation_Status",
+    "Technical_Implementation_Notes",
+    "Evidence_Type",
+    "Evidence_Naming_Example",
+    "ISO_Clause_Reference",
+    "Last_Reviewed_Date",
+    "NIST_CSF_2_Mapping",
+    "Cyber_Essentials_Mapping",
     "Notes",
 ]
 
@@ -48,6 +52,7 @@ ALLOWED_STATUSES = {
 }
 
 CONTROL_ID_RE = re.compile(r"^A\.(5|6|7|8)\.\d{1,2}$")
+DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 
 def read_csv(path: Path) -> list[dict[str, str]]:
@@ -68,42 +73,56 @@ def require_columns(path: Path, rows: list[dict[str, str]], required: Iterable[s
 
 def validate_matrix(rows: list[dict[str, str]]) -> list[str]:
     errors: list[str] = []
+    if not rows:
+        return [f"{MATRIX_PATH}: no data rows found"]
+
     errors.extend(require_columns(MATRIX_PATH, rows, REQUIRED_MATRIX_COLUMNS))
 
     seen_ids: set[str] = set()
     for index, row in enumerate(rows, start=2):
-        control_id = row.get("Control ID", "").strip()
-        status = row.get("Implementation Status", "").strip()
-        title = row.get("Control Title", "").strip()
-        evidence = row.get("Evidence Artefact", "").strip()
-        owner = row.get("Evidence Owner", "").strip()
+        control_id = row.get("Control_ID", "").strip()
+        status = row.get("Implementation_Status", "").strip()
+        title = row.get("Control_Name", "").strip()
+        evidence_type = row.get("Evidence_Type", "").strip()
+        evidence_name = row.get("Evidence_Naming_Example", "").strip()
+        owner = row.get("Control_Owner_Role", "").strip()
+        reviewed = row.get("Last_Reviewed_Date", "").strip()
 
         if not control_id:
-            errors.append(f"{MATRIX_PATH}: row {index} has empty Control ID")
+            errors.append(f"{MATRIX_PATH}: row {index} has empty Control_ID")
             continue
         if not CONTROL_ID_RE.match(control_id):
             errors.append(f"{MATRIX_PATH}: row {index} has invalid ISO control ID '{control_id}'")
         if control_id in seen_ids:
-            errors.append(f"{MATRIX_PATH}: duplicate Control ID '{control_id}'")
+            errors.append(f"{MATRIX_PATH}: duplicate Control_ID '{control_id}'")
         seen_ids.add(control_id)
 
         if not title:
-            errors.append(f"{MATRIX_PATH}: row {index} has empty Control Title")
-        if not evidence:
-            errors.append(f"{MATRIX_PATH}: row {index} has empty Evidence Artefact")
+            errors.append(f"{MATRIX_PATH}: row {index} has empty Control_Name")
         if not owner:
-            errors.append(f"{MATRIX_PATH}: row {index} has empty Evidence Owner")
+            errors.append(f"{MATRIX_PATH}: row {index} has empty Control_Owner_Role")
+        if not evidence_type:
+            errors.append(f"{MATRIX_PATH}: row {index} has empty Evidence_Type")
+        if not evidence_name:
+            errors.append(f"{MATRIX_PATH}: row {index} has empty Evidence_Naming_Example")
         if status not in ALLOWED_STATUSES:
             errors.append(
-                f"{MATRIX_PATH}: row {index} has unsupported Implementation Status '{status}'"
+                f"{MATRIX_PATH}: row {index} has unsupported Implementation_Status '{status}'"
             )
+        if reviewed and not DATE_RE.match(reviewed):
+            errors.append(f"{MATRIX_PATH}: row {index} has invalid Last_Reviewed_Date '{reviewed}'")
+
     return errors
 
 
 def validate_crosswalk(rows: list[dict[str, str]], matrix_ids: set[str]) -> list[str]:
     errors: list[str] = []
+    if not rows:
+        return [f"{CROSSWALK_PATH}: no data rows found"]
+
     errors.extend(require_columns(CROSSWALK_PATH, rows, REQUIRED_CROSSWALK_COLUMNS))
 
+    seen_ids: set[str] = set()
     for index, row in enumerate(rows, start=2):
         control_id = row.get("ISO 27001 Control ID", "").strip()
         if not CONTROL_ID_RE.match(control_id):
@@ -112,6 +131,9 @@ def validate_crosswalk(rows: list[dict[str, str]], matrix_ids: set[str]) -> list
             errors.append(
                 f"{CROSSWALK_PATH}: row {index} references '{control_id}' that is not present in the control matrix"
             )
+        if control_id in seen_ids:
+            errors.append(f"{CROSSWALK_PATH}: duplicate ISO 27001 Control ID '{control_id}'")
+        seen_ids.add(control_id)
         if not row.get("Practical Evidence Example", "").strip():
             errors.append(f"{CROSSWALK_PATH}: row {index} has empty Practical Evidence Example")
     return errors
@@ -141,9 +163,10 @@ def markdown_table(headers: list[str], rows: list[list[str]]) -> str:
 
 def build_dashboard(matrix_rows: list[dict[str, str]], crosswalk_rows: list[dict[str, str]]) -> str:
     generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
-    status_counts = Counter(row["Implementation Status"].strip() for row in matrix_rows)
-    domain_counts = Counter(control_domain(row["Control ID"].strip()) for row in matrix_rows)
-    owner_counts = Counter(row["Evidence Owner"].strip() for row in matrix_rows)
+    status_counts = Counter(row["Implementation_Status"].strip() for row in matrix_rows)
+    domain_counts = Counter(control_domain(row["Control_ID"].strip()) for row in matrix_rows)
+    owner_counts = Counter(row["Control_Owner_Role"].strip() for row in matrix_rows)
+    technology_counts = Counter(row["Technology_Area"].strip() for row in matrix_rows)
 
     return "\n".join(
         [
@@ -158,7 +181,8 @@ def build_dashboard(matrix_rows: list[dict[str, str]], crosswalk_rows: list[dict
                 [
                     ["Control mappings", str(len(matrix_rows))],
                     ["Crosswalk rows", str(len(crosswalk_rows))],
-                    ["Unique evidence owners", str(len(owner_counts))],
+                    ["Unique control owners", str(len(owner_counts))],
+                    ["Technology areas", str(len(technology_counts))],
                 ],
             ),
             "",
@@ -170,21 +194,26 @@ def build_dashboard(matrix_rows: list[dict[str, str]], crosswalk_rows: list[dict
             "",
             markdown_table(["Domain", "Count"], [[domain, str(count)] for domain, count in sorted(domain_counts.items())]),
             "",
-            "## Evidence owner workload",
+            "## Controls by technology area",
             "",
-            markdown_table(["Evidence owner", "Mapped controls"], [[owner, str(count)] for owner, count in owner_counts.most_common()]),
+            markdown_table(["Technology area", "Mapped controls"], [[area, str(count)] for area, count in technology_counts.most_common()]),
+            "",
+            "## Control owner workload",
+            "",
+            markdown_table(["Control owner role", "Mapped controls"], [[owner, str(count)] for owner, count in owner_counts.most_common()]),
             "",
             "## Control register",
             "",
             markdown_table(
-                ["Control ID", "Control title", "Owner", "Frequency", "Status"],
+                ["Control ID", "Control name", "Owner", "Technology area", "Status", "Last reviewed"],
                 [
                     [
-                        row["Control ID"],
-                        row["Control Title"],
-                        row["Evidence Owner"],
-                        row["Review Frequency"],
-                        row["Implementation Status"],
+                        row["Control_ID"],
+                        row["Control_Name"],
+                        row["Control_Owner_Role"],
+                        row["Technology_Area"],
+                        row["Implementation_Status"],
+                        row["Last_Reviewed_Date"],
                     ]
                     for row in matrix_rows
                 ],
@@ -231,7 +260,7 @@ def main() -> int:
     crosswalk_rows = read_csv(CROSSWALK_PATH)
 
     errors.extend(validate_matrix(matrix_rows))
-    matrix_ids = {row["Control ID"].strip() for row in matrix_rows if row.get("Control ID")}
+    matrix_ids = {row["Control_ID"].strip() for row in matrix_rows if row.get("Control_ID")}
     errors.extend(validate_crosswalk(crosswalk_rows, matrix_ids))
 
     if errors:
