@@ -6,7 +6,7 @@ Use this matrix before running repository scripts. Prefer least privilege, local
 | --- | --- | --- | --- |
 | `scripts/validate_repository.py` | Validate repository CSV files and generate local dashboard files. | Working | Safe to run locally from the repository root. |
 | `scripts/m365/Export-M365Iso27001Evidence.ps1` | Export selected Microsoft 365 control evidence to local files. | Partial | Run only in an approved tenant context and protect generated outputs. |
-| `scripts/Get-ISO27001Evidence.ps1` | Collect selected Annex A evidence for a limited set of controls. | Partial | Treat as a starter helper; use `-ReportOnly` before writing files. |
+| `scripts/Get-ISO27001Evidence.ps1` | Collect selected Annex A evidence for A.5.15, A.5.16, A.5.18, A.8.1, A.8.5, A.8.7, A.8.12, A.8.15, and A.8.16. | Partial | All functions are read-only against the tenant. Use `-ReportOnly` before writing files. The A.5.18, A.8.1, A.8.12, and A.8.16 functions default to report-only and write files only when `-OutputPath` is supplied explicitly. |
 
 ## Operator checklist
 

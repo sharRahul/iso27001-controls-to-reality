@@ -12,6 +12,7 @@ The format follows the spirit of [Keep a Changelog](https://keepachangelog.com/e
 
 ### Added
 
+- Read-only evidence functions in `Get-ISO27001Evidence.ps1` for A.5.18 (access review definitions), A.8.1 (Intune device compliance), A.8.12 (Purview DLP policy configuration), and A.8.16 (Identity Protection risk detections). The new functions default to report-only and write files only when `-OutputPath` is supplied explicitly. A.8.8, A.8.23, A.8.24, and A.8.32 remain manual by design and the implementation status file records why.
 - Fixture-based validator tests under `tests/` (standard library `unittest`), covering valid data, a missing column, an unexpected column, an invalid implementation status, a duplicate control ID, and a crosswalk row referencing a control absent from the matrix. The tests run in CI before validation.
 - `--matrix` and `--crosswalk` arguments on `scripts/validate_repository.py` so the validator can be pointed at fixture files; defaults are unchanged.
 - Audit-ready documentation stack.
