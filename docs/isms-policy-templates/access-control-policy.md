@@ -174,7 +174,22 @@ This policy supports the following ISO/IEC 27001:2022 Annex A controls:
 
 ---
 
-## 8. Related Documents
+## 8. Minimum Evidence
+
+The following evidence demonstrates that this policy is operating. Retain outputs in the ISMS evidence folder using the repository evidence naming convention.
+
+| Evidence | Owner | Frequency |
+| --- | --- | --- |
+| Access request and approval samples | System owner | Quarterly |
+| Joiner, mover, leaver ticket samples | HR and IT operations | Quarterly |
+| Privileged role assignment export | Identity owner | Monthly |
+| Access review completion report | Control owner | Quarterly |
+| MFA and Conditional Access export | Identity owner | Monthly |
+| Exception register | Risk owner | Monthly |
+
+---
+
+## 9. Related Documents
 
 - ISMS-POL-001: Acceptable Use Policy
 - ISMS-POL-003: Incident Response Policy
@@ -186,7 +201,7 @@ This policy supports the following ISO/IEC 27001:2022 Annex A controls:
 
 ---
 
-## 9. Version History
+## 10. Version History
 
 | Version | Date | Author | Change Description |
 |---------|------|--------|--------------------|

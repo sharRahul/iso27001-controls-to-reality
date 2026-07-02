@@ -1,0 +1,2 @@
+Control_ID,Control_Name,Annex_A_Domain,Technology_Area,Control_Owner_Role,Implementation_Status,Technical_Implementation_Notes,Evidence_Type,Evidence_Naming_Example,ISO_Clause_Reference,Last_Reviewed_Date,NIST_CSF_2_Mapping,Cyber_Essentials_Mapping,Notes,Extra_Column
+A.5.15,Access control,Organisational controls,M365 / Azure,IAM Owner,Implemented,Synthetic fixture row for validator tests.,CA policy export,2026-01-01_A.5.15_EntraID_CAPolicy-Export_IAMOwner_v1.csv,ISO 27001:2022 Annex A 5.15,2026-01-01,PR.AA-05,User Access Control,Unexpected extra column on purpose.,surplus

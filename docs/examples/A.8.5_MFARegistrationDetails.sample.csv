@@ -1,0 +1,6 @@
+UserPrincipalName,UserDisplayName,IsMfaRegistered,IsMfaCapable,IsPasswordlessCapable,DefaultMfaMethod,MethodsRegistered,IsAdmin
+alex.taylor@contoso.example.com,Alex Taylor,True,True,False,microsoftAuthenticatorPush,microsoftAuthenticatorPush;softwareOneTimePasscode,False
+sam.morgan@contoso.example.com,Sam Morgan,True,True,True,fido2SecurityKey,fido2SecurityKey;microsoftAuthenticatorPush,True
+jamie.patel@contoso.example.com,Jamie Patel,False,False,False,,,False
+chris.evans@contoso.example.com,Chris Evans,True,True,False,softwareOneTimePasscode,softwareOneTimePasscode,False
+priya.shah@contoso.example.com,Priya Shah,True,True,False,microsoftAuthenticatorPush,microsoftAuthenticatorPush,False

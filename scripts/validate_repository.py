@@ -71,12 +71,32 @@ def require_columns(path: Path, rows: list[dict[str, str]], required: Iterable[s
     return errors
 
 
-def validate_matrix(rows: list[dict[str, str]]) -> list[str]:
+def require_exact_columns(path: Path, rows: list[dict[str, str]], required: list[str]) -> list[str]:
+    """Require the header row to match the expected schema exactly, including order."""
+    errors: list[str] = []
+    columns = list(rows[0].keys()) if rows else []
+    if columns == required:
+        return errors
+    for column in required:
+        if column not in columns:
+            errors.append(f"{path}: missing required column '{column}'")
+    for column in columns:
+        if column not in required:
+            errors.append(f"{path}: unexpected column '{column}'")
+    if not errors:
+        errors.append(
+            f"{path}: column order does not match the expected schema "
+            f"(expected: {','.join(required)})"
+        )
+    return errors
+
+
+def validate_matrix(rows: list[dict[str, str]], path: Path = MATRIX_PATH) -> list[str]:
     errors: list[str] = []
     if not rows:
-        return [f"{MATRIX_PATH}: no data rows found"]
+        return [f"{path}: no data rows found"]
 
-    errors.extend(require_columns(MATRIX_PATH, rows, REQUIRED_MATRIX_COLUMNS))
+    errors.extend(require_exact_columns(path, rows, REQUIRED_MATRIX_COLUMNS))
 
     seen_ids: set[str] = set()
     for index, row in enumerate(rows, start=2):
@@ -89,38 +109,40 @@ def validate_matrix(rows: list[dict[str, str]]) -> list[str]:
         reviewed = row.get("Last_Reviewed_Date", "").strip()
 
         if not control_id:
-            errors.append(f"{MATRIX_PATH}: row {index} has empty Control_ID")
+            errors.append(f"{path}: row {index} has empty Control_ID")
             continue
         if not CONTROL_ID_RE.match(control_id):
-            errors.append(f"{MATRIX_PATH}: row {index} has invalid ISO control ID '{control_id}'")
+            errors.append(f"{path}: row {index} has invalid ISO control ID '{control_id}'")
         if control_id in seen_ids:
-            errors.append(f"{MATRIX_PATH}: duplicate Control_ID '{control_id}'")
+            errors.append(f"{path}: duplicate Control_ID '{control_id}'")
         seen_ids.add(control_id)
 
         if not title:
-            errors.append(f"{MATRIX_PATH}: row {index} has empty Control_Name")
+            errors.append(f"{path}: row {index} has empty Control_Name")
         if not owner:
-            errors.append(f"{MATRIX_PATH}: row {index} has empty Control_Owner_Role")
+            errors.append(f"{path}: row {index} has empty Control_Owner_Role")
         if not evidence_type:
-            errors.append(f"{MATRIX_PATH}: row {index} has empty Evidence_Type")
+            errors.append(f"{path}: row {index} has empty Evidence_Type")
         if not evidence_name:
-            errors.append(f"{MATRIX_PATH}: row {index} has empty Evidence_Naming_Example")
+            errors.append(f"{path}: row {index} has empty Evidence_Naming_Example")
         if status not in ALLOWED_STATUSES:
             errors.append(
-                f"{MATRIX_PATH}: row {index} has unsupported Implementation_Status '{status}'"
+                f"{path}: row {index} has unsupported Implementation_Status '{status}'"
             )
         if reviewed and not DATE_RE.match(reviewed):
-            errors.append(f"{MATRIX_PATH}: row {index} has invalid Last_Reviewed_Date '{reviewed}'")
+            errors.append(f"{path}: row {index} has invalid Last_Reviewed_Date '{reviewed}'")
 
     return errors
 
 
-def validate_crosswalk(rows: list[dict[str, str]], matrix_ids: set[str]) -> list[str]:
+def validate_crosswalk(
+    rows: list[dict[str, str]], matrix_ids: set[str], path: Path = CROSSWALK_PATH
+) -> list[str]:
     errors: list[str] = []
     if not rows:
-        return [f"{CROSSWALK_PATH}: no data rows found"]
+        return [f"{path}: no data rows found"]
 
-    errors.extend(require_columns(CROSSWALK_PATH, rows, REQUIRED_CROSSWALK_COLUMNS))
+    errors.extend(require_columns(path, rows, REQUIRED_CROSSWALK_COLUMNS))
 
     seen_ids: set[str] = set()
     for index, row in enumerate(rows, start=2):
@@ -253,15 +275,27 @@ def main() -> int:
         default=None,
         help="Optional output directory for generated dashboard markdown and HTML.",
     )
+    parser.add_argument(
+        "--matrix",
+        type=Path,
+        default=MATRIX_PATH,
+        help="Path to the control mapping matrix CSV. Defaults to the committed matrix.",
+    )
+    parser.add_argument(
+        "--crosswalk",
+        type=Path,
+        default=CROSSWALK_PATH,
+        help="Path to the crosswalk CSV. Defaults to the committed crosswalk.",
+    )
     args = parser.parse_args()
 
     errors: list[str] = []
-    matrix_rows = read_csv(MATRIX_PATH)
-    crosswalk_rows = read_csv(CROSSWALK_PATH)
+    matrix_rows = read_csv(args.matrix)
+    crosswalk_rows = read_csv(args.crosswalk)
 
-    errors.extend(validate_matrix(matrix_rows))
+    errors.extend(validate_matrix(matrix_rows, args.matrix))
     matrix_ids = {row["Control_ID"].strip() for row in matrix_rows if row.get("Control_ID")}
-    errors.extend(validate_crosswalk(crosswalk_rows, matrix_ids))
+    errors.extend(validate_crosswalk(crosswalk_rows, matrix_ids, args.crosswalk))
 
     if errors:
         print("Repository validation failed:")

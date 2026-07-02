@@ -15,13 +15,18 @@
     -ControlID or -All parameters.
 
 .PARAMETER ControlID
-    The Annex A control ID to collect evidence for. Accepted values: A.8.5, A.5.15, A.8.15, A.5.16, A.8.7.
+    The Annex A control ID to collect evidence for. Accepted values: A.8.5, A.5.15, A.8.15,
+    A.5.16, A.8.7, A.5.18, A.8.1, A.8.12, A.8.16.
 
 .PARAMETER All
     Run all evidence collection functions.
 
 .PARAMETER ReportOnly
-    Display results to the console without writing output files.
+    Display results to the console without writing output files. All evidence functions are
+    read-only against the tenant in every mode; this switch only suppresses local file output.
+    The functions added for A.5.18, A.8.1, A.8.12, and A.8.16 default to report-only: they
+    write files only when -OutputPath is supplied explicitly or -ReportOnly is absent and
+    -OutputPath is given.
 
 .PARAMETER OutputPath
     Directory path for output files. Defaults to the current working directory.
@@ -49,9 +54,15 @@
     - Microsoft.Graph PowerShell module (Install-Module Microsoft.Graph)
     - ExchangeOnlineManagement module (Install-Module ExchangeOnlineManagement)
     - Appropriate permissions: Reports.Read.All, Policy.Read.All, RoleManagement.Read.Directory,
-      Directory.Read.All, DeviceManagementConfiguration.Read.All
+      Directory.Read.All, DeviceManagementConfiguration.Read.All, AccessReview.Read.All,
+      DeviceManagementManagedDevices.Read.All, IdentityRiskEvent.Read.All, plus Security and
+      Compliance PowerShell access for the A.8.12 DLP policy export.
+      See docs/permissions-matrix.md for the minimum scopes per function.
 
-    Version : 1.0.0
+    All evidence functions are read-only: they call Microsoft Graph GET endpoints or read-only
+    Get-* cmdlets and never change tenant configuration.
+
+    Version : 1.1.0
     Author  : ISO 27001 Controls to Reality
     Licence : MIT
 #>
@@ -59,7 +70,7 @@
 [CmdletBinding(DefaultParameterSetName = 'ByControlID')]
 param (
     [Parameter(ParameterSetName = 'ByControlID', Mandatory = $true)]
-    [ValidateSet('A.8.5', 'A.5.15', 'A.8.15', 'A.5.16', 'A.8.7')]
+    [ValidateSet('A.8.5', 'A.5.15', 'A.8.15', 'A.5.16', 'A.8.7', 'A.5.18', 'A.8.1', 'A.8.12', 'A.8.16')]
     [string]$ControlID,
 
     [Parameter(ParameterSetName = 'All', Mandatory = $true)]
@@ -147,6 +158,27 @@ function Assert-ExchangeConnected {
         }
     } catch {
         Write-Error "Failed to connect to Exchange Online: $_"
+        throw
+    }
+}
+
+function Assert-ComplianceConnected {
+    <#
+    .SYNOPSIS
+        Checks for an existing Security and Compliance PowerShell session and connects if one is not present.
+    .DESCRIPTION
+        Security and Compliance cmdlets (e.g. Get-DlpCompliancePolicy) are only available after
+        Connect-IPPSSession. The session is used for read-only Get-* cmdlets only.
+    #>
+    try {
+        if (-not (Get-Command Get-DlpCompliancePolicy -ErrorAction SilentlyContinue)) {
+            Write-Host "[AUTH] No Security and Compliance session detected. Connecting..." -ForegroundColor Yellow
+            Connect-IPPSSession -ShowBanner:$false
+        } else {
+            Write-Host "[AUTH] Using existing Security and Compliance session." -ForegroundColor Green
+        }
+    } catch {
+        Write-Error "Failed to connect to Security and Compliance PowerShell: $_"
         throw
     }
 }
@@ -471,6 +503,221 @@ function Get-AntiMalwareConfig {
     }
 }
 
+function Get-AccessReviewStatus {
+    <#
+    .SYNOPSIS
+        READ-ONLY. Exports Entra ID access review definitions and their status. Maps to A.5.18 (Access Rights).
+    .DESCRIPTION
+        Queries Microsoft Graph identityGovernance/accessReviews/definitions and returns each
+        access review series with its status, scope, and recurrence so the operator can evidence
+        that periodic access reviews are defined and running. Requires the AccessReview.Read.All
+        scope and an Entra ID P2 (or Entra ID Governance) licence. This function only issues
+        Graph GET requests and never changes tenant configuration.
+    .PARAMETER ReportOnly
+        If set, outputs results to the console instead of writing a file.
+    .PARAMETER OutputPath
+        Directory for the output CSV.
+    .PARAMETER Owner
+        Evidence owner identifier for the filename.
+    #>
+    [CmdletBinding()]
+    param (
+        [switch]$ReportOnly,
+        [string]$OutputPath,
+        [string]$Owner
+    )
+
+    Write-Host "`n[A.5.18] Collecting access review definitions (read-only)..." -ForegroundColor Magenta
+
+    Assert-GraphConnected -Scopes @('AccessReview.Read.All')
+
+    try {
+        $reviews = Get-MgIdentityGovernanceAccessReviewDefinition -All |
+            Select-Object DisplayName, Status, CreatedDateTime, LastModifiedDateTime, Id,
+                @{N='Recurrence';   E={ $_.Settings.Recurrence.Pattern.Type }},
+                @{N='ScopeQuery';   E={ $_.Scope.AdditionalProperties['query'] }},
+                @{N='CollectedAt';  E={ Get-Date -Format 'yyyy-MM-dd HH:mm:ss' }}
+
+        $total = ($reviews | Measure-Object).Count
+        Write-Host "[A.5.18] Access review definitions found: $total" -ForegroundColor White
+        if ($total -eq 0) {
+            Write-Warning "[A.5.18] No access review definitions exist. Access reviews may not be configured, which is an audit gap for A.5.18."
+        }
+
+        if ($ReportOnly) {
+            $reviews | Format-Table DisplayName, Status, Recurrence, LastModifiedDateTime -AutoSize
+        } else {
+            $fileName = Get-EvidenceFileName -ControlID 'A.5.18' -System 'EntraID' `
+                            -EvidenceType 'AccessReviewDefinitions' -Extension 'csv' -Owner $Owner
+            Write-EvidenceFile -Data $reviews -FileName $fileName -OutputPath $OutputPath
+        }
+    } catch {
+        Write-Warning "[A.5.18] Failed to collect access review definitions: $_"
+    }
+}
+
+function Get-DeviceComplianceStatus {
+    <#
+    .SYNOPSIS
+        READ-ONLY. Exports Intune managed device compliance state. Maps to A.8.1 (User Endpoint Devices).
+    .DESCRIPTION
+        Queries Microsoft Graph deviceManagement/managedDevices and returns per-device compliance
+        state, encryption status, operating system version, and last sync time so the operator can
+        evidence that the endpoint baseline is monitored. Requires the
+        DeviceManagementManagedDevices.Read.All scope. This function only issues Graph GET
+        requests and never changes device or tenant configuration.
+    .PARAMETER ReportOnly
+        If set, outputs results to the console instead of writing a file.
+    .PARAMETER OutputPath
+        Directory for the output CSV.
+    .PARAMETER Owner
+        Evidence owner identifier for the filename.
+    #>
+    [CmdletBinding()]
+    param (
+        [switch]$ReportOnly,
+        [string]$OutputPath,
+        [string]$Owner
+    )
+
+    Write-Host "`n[A.8.1] Collecting managed device compliance status (read-only)..." -ForegroundColor Magenta
+
+    Assert-GraphConnected -Scopes @('DeviceManagementManagedDevices.Read.All')
+
+    try {
+        $devices = Get-MgDeviceManagementManagedDevice -All |
+            Select-Object DeviceName, UserPrincipalName, OperatingSystem, OSVersion,
+                          ComplianceState, IsEncrypted, ManagedDeviceOwnerType,
+                          EnrolledDateTime, LastSyncDateTime,
+                @{N='CollectedAt'; E={ Get-Date -Format 'yyyy-MM-dd HH:mm:ss' }}
+
+        $total        = ($devices | Measure-Object).Count
+        $compliant    = ($devices | Where-Object { $_.ComplianceState -eq 'compliant' }).Count
+        $notEncrypted = ($devices | Where-Object { -not $_.IsEncrypted }).Count
+
+        Write-Host "[A.8.1] Devices: $total | Compliant: $compliant | Not encrypted: $notEncrypted" -ForegroundColor White
+
+        if ($ReportOnly) {
+            $devices | Format-Table DeviceName, OperatingSystem, ComplianceState, IsEncrypted, LastSyncDateTime -AutoSize
+        } else {
+            $fileName = Get-EvidenceFileName -ControlID 'A.8.1' -System 'Intune' `
+                            -EvidenceType 'DeviceCompliance' -Extension 'csv' -Owner $Owner
+            Write-EvidenceFile -Data $devices -FileName $fileName -OutputPath $OutputPath
+        }
+    } catch {
+        Write-Warning "[A.8.1] Failed to collect device compliance status: $_"
+    }
+}
+
+function Get-DlpPolicyConfig {
+    <#
+    .SYNOPSIS
+        READ-ONLY. Exports Microsoft Purview DLP policy configuration. Maps to A.8.12 (Data Leakage Prevention).
+    .DESCRIPTION
+        Uses the read-only Get-DlpCompliancePolicy cmdlet from Security and Compliance PowerShell
+        to return each DLP policy with its mode and workload locations so the operator can
+        evidence that DLP policies exist and are enforced (not in test mode). Requires
+        Connect-IPPSSession access with a compliance reader role or above. This function only
+        calls read-only Get-* cmdlets and never changes policy configuration.
+    .PARAMETER ReportOnly
+        If set, outputs results to the console instead of writing a file.
+    .PARAMETER OutputPath
+        Directory for the output CSV.
+    .PARAMETER Owner
+        Evidence owner identifier for the filename.
+    #>
+    [CmdletBinding()]
+    param (
+        [switch]$ReportOnly,
+        [string]$OutputPath,
+        [string]$Owner
+    )
+
+    Write-Host "`n[A.8.12] Collecting Purview DLP policy configuration (read-only)..." -ForegroundColor Magenta
+
+    Assert-ComplianceConnected
+
+    try {
+        $dlpPolicies = Get-DlpCompliancePolicy |
+            Select-Object Name, Mode, Enabled, Priority, WhenChanged,
+                @{N='ExchangeLocation';   E={ ($_.ExchangeLocation   | ForEach-Object { "$_" }) -join '; ' }},
+                @{N='SharePointLocation'; E={ ($_.SharePointLocation | ForEach-Object { "$_" }) -join '; ' }},
+                @{N='OneDriveLocation';   E={ ($_.OneDriveLocation   | ForEach-Object { "$_" }) -join '; ' }},
+                @{N='TeamsLocation';      E={ ($_.TeamsLocation      | ForEach-Object { "$_" }) -join '; ' }},
+                @{N='CollectedAt';        E={ Get-Date -Format 'yyyy-MM-dd HH:mm:ss' }}
+
+        $total    = ($dlpPolicies | Measure-Object).Count
+        $testMode = ($dlpPolicies | Where-Object { $_.Mode -like 'Test*' }).Count
+        Write-Host "[A.8.12] DLP policies: $total | In test mode: $testMode" -ForegroundColor White
+        if ($testMode -gt 0) {
+            Write-Warning "[A.8.12] $testMode DLP policies are in test mode and are not enforcing. Auditors treat this as a gap for in-scope data."
+        }
+
+        if ($ReportOnly) {
+            $dlpPolicies | Format-Table Name, Mode, Enabled, WhenChanged -AutoSize
+        } else {
+            $fileName = Get-EvidenceFileName -ControlID 'A.8.12' -System 'Purview' `
+                            -EvidenceType 'DLPPolicy-Export' -Extension 'csv' -Owner $Owner
+            Write-EvidenceFile -Data $dlpPolicies -FileName $fileName -OutputPath $OutputPath
+        }
+    } catch {
+        Write-Warning "[A.8.12] Failed to collect DLP policy configuration: $_"
+    }
+}
+
+function Get-RiskDetections {
+    <#
+    .SYNOPSIS
+        READ-ONLY. Exports recent Entra ID Identity Protection risk detections. Maps to A.8.16 (Monitoring Activities).
+    .DESCRIPTION
+        Queries Microsoft Graph identityProtection/riskDetections and returns a sample of recent
+        risk detections with type, level, state, and detection time so the operator can evidence
+        that anomalous activity is detected and triaged. Requires the IdentityRiskEvent.Read.All
+        scope and an Entra ID P2 licence. This function only issues Graph GET requests and never
+        changes tenant configuration.
+    .PARAMETER ReportOnly
+        If set, outputs results to the console instead of writing a file.
+    .PARAMETER OutputPath
+        Directory for the output CSV.
+    .PARAMETER Owner
+        Evidence owner identifier for the filename.
+    .PARAMETER Limit
+        Maximum number of risk detections to return. Defaults to 500.
+    #>
+    [CmdletBinding()]
+    param (
+        [switch]$ReportOnly,
+        [string]$OutputPath,
+        [string]$Owner,
+        [int]$Limit = 500
+    )
+
+    Write-Host "`n[A.8.16] Collecting Identity Protection risk detections (read-only)..." -ForegroundColor Magenta
+
+    Assert-GraphConnected -Scopes @('IdentityRiskEvent.Read.All')
+
+    try {
+        $detections = Get-MgRiskDetection -Top $Limit |
+            Select-Object DetectedDateTime, RiskEventType, RiskLevel, RiskState, RiskDetail,
+                          UserPrincipalName, Activity, Source,
+                @{N='CollectedAt'; E={ Get-Date -Format 'yyyy-MM-dd HH:mm:ss' }}
+
+        $total     = ($detections | Measure-Object).Count
+        $openHigh  = ($detections | Where-Object { $_.RiskLevel -eq 'high' -and $_.RiskState -eq 'atRisk' }).Count
+        Write-Host "[A.8.16] Risk detections sampled: $total | Open high-risk: $openHigh" -ForegroundColor White
+
+        if ($ReportOnly) {
+            $detections | Format-Table DetectedDateTime, RiskEventType, RiskLevel, RiskState, UserPrincipalName -AutoSize
+        } else {
+            $fileName = Get-EvidenceFileName -ControlID 'A.8.16' -System 'EntraID' `
+                            -EvidenceType 'RiskDetections' -Extension 'csv' -Owner $Owner
+            Write-EvidenceFile -Data $detections -FileName $fileName -OutputPath $OutputPath
+        }
+    } catch {
+        Write-Warning "[A.8.16] Failed to collect risk detections: $_"
+    }
+}
+
 #endregion Evidence Functions
 
 #region Main Execution
@@ -486,6 +733,18 @@ $commonParams = @{
     Owner      = $Owner
 }
 
+# Functions added in v1.1.0 default to report-only: they write files only when the operator
+# supplies -OutputPath explicitly. Existing functions keep their original behaviour.
+$newFunctionReportOnly = $ReportOnly -or (-not $PSBoundParameters.ContainsKey('OutputPath'))
+$newFunctionParams = @{
+    ReportOnly = $newFunctionReportOnly
+    OutputPath = $OutputPath
+    Owner      = $Owner
+}
+if ($newFunctionReportOnly -and -not $ReportOnly) {
+    Write-Host "[SAFE-DEFAULT] A.5.18 / A.8.1 / A.8.12 / A.8.16 run in report-only mode unless -OutputPath is supplied explicitly." -ForegroundColor Yellow
+}
+
 Write-Host "==================================================" -ForegroundColor DarkCyan
 Write-Host " ISO 27001:2022 Evidence Collection Script" -ForegroundColor Cyan
 Write-Host " Date    : $(Get-Date -Format 'yyyy-MM-dd HH:mm')" -ForegroundColor Cyan
@@ -493,18 +752,26 @@ Write-Host " Mode    : $(if ($ReportOnly) { 'Report Only (no files written)' } e
 Write-Host "==================================================" -ForegroundColor DarkCyan
 
 if ($PSCmdlet.ParameterSetName -eq 'All') {
-    Get-MFAStatus         @commonParams
-    Get-ConditionalAccess @commonParams
-    Get-AuditLogStatus    @commonParams
-    Get-PrivilegedRoles   @commonParams
-    Get-AntiMalwareConfig @commonParams
+    Get-MFAStatus              @commonParams
+    Get-ConditionalAccess      @commonParams
+    Get-AuditLogStatus         @commonParams
+    Get-PrivilegedRoles        @commonParams
+    Get-AntiMalwareConfig      @commonParams
+    Get-AccessReviewStatus     @newFunctionParams
+    Get-DeviceComplianceStatus @newFunctionParams
+    Get-DlpPolicyConfig        @newFunctionParams
+    Get-RiskDetections         @newFunctionParams
 } else {
     switch ($ControlID) {
-        'A.8.5'  { Get-MFAStatus         @commonParams }
-        'A.5.15' { Get-ConditionalAccess @commonParams }
-        'A.8.15' { Get-AuditLogStatus    @commonParams }
-        'A.5.16' { Get-PrivilegedRoles   @commonParams }
-        'A.8.7'  { Get-AntiMalwareConfig @commonParams }
+        'A.8.5'  { Get-MFAStatus              @commonParams }
+        'A.5.15' { Get-ConditionalAccess      @commonParams }
+        'A.8.15' { Get-AuditLogStatus         @commonParams }
+        'A.5.16' { Get-PrivilegedRoles        @commonParams }
+        'A.8.7'  { Get-AntiMalwareConfig      @commonParams }
+        'A.5.18' { Get-AccessReviewStatus     @newFunctionParams }
+        'A.8.1'  { Get-DeviceComplianceStatus @newFunctionParams }
+        'A.8.12' { Get-DlpPolicyConfig        @newFunctionParams }
+        'A.8.16' { Get-RiskDetections         @newFunctionParams }
     }
 }
 

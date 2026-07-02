@@ -1,0 +1,10 @@
+# Python
+__pycache__/
+*.pyc
+
+# Local validator output (the committed sample lives in docs/dashboard/)
+build/
+
+# Local evidence exports must never be committed
+evidence/
+*.evidence.csv

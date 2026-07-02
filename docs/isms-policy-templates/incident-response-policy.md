@@ -172,13 +172,29 @@ This policy supports the following ISO/IEC 27001:2022 Annex A controls:
 | A.5.24 | Information security incident management planning and preparation |
 | A.5.25 | Assessment and decision on information security events |
 | A.5.26 | Response to information security incidents |
+| A.5.27 | Learning from information security incidents |
 | A.5.28 | Collection of evidence |
 | A.8.15 | Logging |
 | A.8.16 | Monitoring activities |
 
 ---
 
-## 9. Related Documents
+## 9. Minimum Evidence
+
+The following evidence demonstrates that this policy is operating. Retain outputs in the ISMS evidence folder using the repository evidence naming convention.
+
+| Evidence | Owner | Frequency |
+| --- | --- | --- |
+| Incident response plan | SOC or security manager | Annual |
+| Severity matrix and escalation contacts | SOC or security manager | Quarterly |
+| Incident tickets and triage notes | SOC | Per incident |
+| Tabletop exercise report | Security manager | Annual or semi-annual |
+| Lessons learned tracker | Incident owner | Per incident |
+| Evidence handling record | Incident owner | Per incident |
+
+---
+
+## 10. Related Documents
 
 - ISMS-POL-001: Acceptable Use Policy
 - ISMS-POL-002: Access Control Policy
@@ -193,7 +209,7 @@ This policy supports the following ISO/IEC 27001:2022 Annex A controls:
 
 ---
 
-## 10. Version History
+## 11. Version History
 
 | Version | Date | Author | Change Description |
 |---------|------|--------|--------------------|

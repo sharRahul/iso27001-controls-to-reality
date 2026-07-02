@@ -36,41 +36,76 @@ To improve discoverability, apply the following topics to this repository via th
 ├── CONTRIBUTING.md
 ├── CHANGELOG.md
 ├── LICENSE
+├── requirements.txt
+├── .gitignore
 ├── .github/
+│   ├── pull_request_template.md
+│   ├── ISSUE_TEMPLATE/
+│   │   ├── config.yml
+│   │   ├── bug_report.md
+│   │   └── control_guide_request.md
 │   └── workflows/
 │       └── validate-and-dashboard.yml
 ├── docs/
 │   ├── IMPLEMENTATION_STATUS.md
 │   ├── control-mapping-matrix.csv
 │   ├── evidence-collection-guide.md
+│   ├── script-readiness-matrix.md
 │   ├── statement-of-applicability-template.md
 │   ├── audit-readiness-checklist.md
 │   ├── risk-register-template.md
 │   ├── framework-crosswalk.md
+│   ├── permissions-matrix.md
 │   ├── controls/
+│   │   ├── _TEMPLATE.md
+│   │   ├── A.5.9-inventory-of-assets.md
 │   │   ├── A.5.15-access-control.md
 │   │   ├── A.5.16-identity-management.md
+│   │   ├── A.5.17-authentication-information.md
+│   │   ├── A.5.24-incident-management-planning.md
 │   │   ├── A.6.3-security-awareness-training.md
+│   │   ├── A.8.1-user-endpoint-devices.md
 │   │   ├── A.8.2-privileged-access-rights.md
 │   │   ├── A.8.5-secure-authentication.md
 │   │   ├── A.8.7-protection-against-malware.md
+│   │   ├── A.8.9-configuration-management.md
 │   │   └── A.8.15-logging-and-monitoring.md
 │   ├── crosswalks/
 │   │   └── iso27001-nist-csf2-cyber-essentials.csv
+│   ├── dashboard/
+│   │   ├── README.md
+│   │   ├── control-status-dashboard.md
+│   │   └── control-status-dashboard.html
+│   ├── examples/
+│   │   ├── README.md
+│   │   ├── A.8.5_MFARegistrationDetails.sample.csv
+│   │   ├── A.8.15_RecentSignIns.sample.csv
+│   │   └── M365_Evidence_Index.sample.csv
 │   ├── isms-policy-templates/
 │   │   ├── acceptable-use-policy.md
 │   │   ├── access-control-policy.md
 │   │   └── incident-response-policy.md
-│   ├── policies/
+│   ├── policies/            (pointer notes to isms-policy-templates/)
 │   │   ├── access-control-policy-template.md
 │   │   └── incident-response-policy-template.md
 │   └── templates/
+│       ├── README.md
 │       └── risk-register-template.csv
-└── scripts/
-    ├── Get-ISO27001Evidence.ps1
-    ├── validate_repository.py
-    └── m365/
-        └── Export-M365Iso27001Evidence.ps1
+├── scripts/
+│   ├── Get-ISO27001Evidence.ps1
+│   ├── validate_repository.py
+│   └── m365/
+│       └── Export-M365Iso27001Evidence.ps1
+└── tests/
+    ├── test_validate_repository.py
+    └── fixtures/
+        ├── valid-matrix.csv
+        ├── valid-crosswalk.csv
+        ├── matrix-missing-column.csv
+        ├── matrix-unexpected-column.csv
+        ├── matrix-invalid-status.csv
+        ├── matrix-duplicate-id.csv
+        └── crosswalk-unknown-control.csv
 ```
 
 ## Quick start
@@ -80,8 +115,8 @@ To improve discoverability, apply the following topics to this repository via th
 3. Use [`docs/evidence-collection-guide.md`](docs/evidence-collection-guide.md) to collect screenshots, exports, logs, policy documents, and ticket references.
 4. Refer to the per-control guides in [`docs/controls/`](docs/controls/) for detailed implementation notes, evidence checklists, and audit questions for individual Annex A controls.
 5. Copy [`docs/statement-of-applicability-template.md`](docs/statement-of-applicability-template.md) into your ISMS evidence folder and complete the applicability and justification fields.
-6. Use [`docs/risk-register-template.md`](docs/risk-register-template.md) or [`docs/templates/risk-register-template.csv`](docs/templates/risk-register-template.csv) to document, score, and track information security risks.
-7. Adapt the policy templates in [`docs/isms-policy-templates/`](docs/isms-policy-templates/) or [`docs/policies/`](docs/policies/) to your organisation's context.
+6. Use [`docs/risk-register-template.md`](docs/risk-register-template.md) (narrative guide with scoring guidance and worked examples) or [`docs/templates/risk-register-template.csv`](docs/templates/risk-register-template.csv) (importable CSV) to document, score, and track information security risks.
+7. Adapt the policy templates in [`docs/isms-policy-templates/`](docs/isms-policy-templates/) to your organisation's context.
 8. Run through [`docs/audit-readiness-checklist.md`](docs/audit-readiness-checklist.md) before internal audit, stage 1, stage 2, or surveillance audit activity.
 9. Use [`docs/framework-crosswalk.md`](docs/framework-crosswalk.md) or [`docs/crosswalks/iso27001-nist-csf2-cyber-essentials.csv`](docs/crosswalks/iso27001-nist-csf2-cyber-essentials.csv) if you are aligning ISO 27001 with NIST CSF 2.0 or Cyber Essentials.
 
@@ -97,7 +132,8 @@ python scripts/validate_repository.py --dashboard-dir build/control-dashboard
 
 This checks:
 
-- Required CSV columns for the committed matrix and crosswalk schemas.
+- Exact header schema (including column order) for the committed control matrix.
+- Required CSV columns for the crosswalk schema.
 - ISO 27001 Annex A control ID format.
 - Duplicate control IDs.
 - Supported implementation status values.
@@ -108,7 +144,11 @@ It also generates:
 - `build/control-dashboard/control-status-dashboard.md`
 - `build/control-dashboard/control-status-dashboard.html`
 
-The GitHub Actions workflow [`validate-and-dashboard.yml`](.github/workflows/validate-and-dashboard.yml) runs the same validation on push, pull request, and manual dispatch, then uploads the dashboard as a workflow artifact.
+A committed sample of the dashboard output lives in [`docs/dashboard/`](docs/dashboard/) so you can see the result without running anything. No third-party Python packages are needed; see [`requirements.txt`](requirements.txt). CI pins Python 3.12.
+
+The GitHub Actions workflow [`validate-and-dashboard.yml`](.github/workflows/validate-and-dashboard.yml) is the single CI validation path. It runs the validator test suite (`python -m unittest discover -s tests`) and `scripts/validate_repository.py` on push, pull request, and manual dispatch, publishes the generated dashboard to the job summary, and uploads it as a workflow artifact. All CSV schema, status value, and duplicate ID checks live in the Python validator so there is one source of truth.
+
+Before running the scripts, check [`docs/script-readiness-matrix.md`](docs/script-readiness-matrix.md) for per-script maturity and operator notes, and [`docs/permissions-matrix.md`](docs/permissions-matrix.md) for the minimum Graph scopes and Entra roles each script needs. Synthetic example outputs live in [`docs/examples/`](docs/examples/) so you can see the expected shape of each export without connecting to a tenant.
 
 ### Export Microsoft 365 evidence
 
