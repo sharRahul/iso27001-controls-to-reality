@@ -12,6 +12,8 @@ The format follows the spirit of [Keep a Changelog](https://keepachangelog.com/e
 
 ### Added
 
+- Fixture-based validator tests under `tests/` (standard library `unittest`), covering valid data, a missing column, an unexpected column, an invalid implementation status, a duplicate control ID, and a crosswalk row referencing a control absent from the matrix. The tests run in CI before validation.
+- `--matrix` and `--crosswalk` arguments on `scripts/validate_repository.py` so the validator can be pointed at fixture files; defaults are unchanged.
 - Audit-ready documentation stack.
 - Control mapping matrix for practical ISO 27001:2022 Annex A implementation tracking.
 - Evidence collection guide for control owners and auditors.

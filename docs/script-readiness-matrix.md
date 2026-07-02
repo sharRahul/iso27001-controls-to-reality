@@ -24,4 +24,7 @@ Use this matrix before running repository scripts. Prefer least privilege, local
 - Add per-script example commands.
 - Add minimum role and permission details.
 - Add synthetic evidence examples.
-- Add tests for validator fixture files.
+
+## Completed
+
+- Fixture-based validator tests live in `tests/` and run in CI.

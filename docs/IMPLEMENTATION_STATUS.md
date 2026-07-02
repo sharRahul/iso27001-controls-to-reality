@@ -10,6 +10,7 @@ This document separates working repository capability from planned or partially 
 | Framework crosswalk | Working | `docs/crosswalks/iso27001-nist-csf2-cyber-essentials.csv` maps selected ISO 27001 controls to NIST CSF 2.0 and Cyber Essentials themes. |
 | Matrix and crosswalk validation | Working | `scripts/validate_repository.py` validates the committed CSV schema, status values, duplicate IDs, date format, and crosswalk references. |
 | Dashboard generation | Working | The validator can generate Markdown and HTML dashboard files under a supplied output directory. |
+| Validator tests | Working | `tests/test_validate_repository.py` runs fixture-based tests (valid and deliberately broken CSVs) in CI via `python -m unittest`. |
 | Microsoft 365 evidence export | Partial | `scripts/m365/Export-M365Iso27001Evidence.ps1` exports selected read-only evidence for MFA registration, Conditional Access, privileged roles, sign-ins, and audit events. |
 | Modular evidence helper | Partial | `scripts/Get-ISO27001Evidence.ps1` covers a limited set of controls and should be treated as a starter evidence helper. |
 | Per-control guides | Partial | Detailed Markdown guides exist for selected high-value controls only. |
@@ -55,9 +56,12 @@ This document separates working repository capability from planned or partially 
 
 1. Add per-control guides for controls that appear in the crosswalk but do not yet have detailed Markdown guidance.
 2. Expand read-only evidence automation for A.5.18, A.8.1, A.8.8, A.8.12, A.8.16, A.8.23, A.8.24, and A.8.32.
-3. Add fixture-based tests for the validator so schema drift is caught before merge.
-4. Add synthetic evidence examples that show acceptable redacted outputs without exposing real tenant data.
-5. Add a permissions matrix for each PowerShell evidence script.
+3. Add synthetic evidence examples that show acceptable redacted outputs without exposing real tenant data.
+4. Add a permissions matrix for each PowerShell evidence script.
+
+## Completed backlog items
+
+- Fixture-based validator tests run in CI (`tests/`), so schema drift is caught before merge.
 
 ## Contributor rule
 

@@ -1,0 +1,3 @@
+ISO 27001 Control ID,ISO 27001 Control Title,NIST CSF 2.0 Function,NIST CSF 2.0 Categories,Cyber Essentials Theme,Practical Evidence Example
+A.5.15,Access control,Protect,PR.AA,User access control,Access control policy RBAC design and sample joiner mover leaver ticket
+A.8.99,Control absent from the matrix,Protect,PR.AA,User access control,References a control that does not exist in the matrix on purpose

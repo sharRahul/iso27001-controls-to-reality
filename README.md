@@ -68,11 +68,21 @@ To improve discoverability, apply the following topics to this repository via th
 │   └── templates/
 │       ├── README.md
 │       └── risk-register-template.csv
-└── scripts/
-    ├── Get-ISO27001Evidence.ps1
-    ├── validate_repository.py
-    └── m365/
-        └── Export-M365Iso27001Evidence.ps1
+├── scripts/
+│   ├── Get-ISO27001Evidence.ps1
+│   ├── validate_repository.py
+│   └── m365/
+│       └── Export-M365Iso27001Evidence.ps1
+└── tests/
+    ├── test_validate_repository.py
+    └── fixtures/
+        ├── valid-matrix.csv
+        ├── valid-crosswalk.csv
+        ├── matrix-missing-column.csv
+        ├── matrix-unexpected-column.csv
+        ├── matrix-invalid-status.csv
+        ├── matrix-duplicate-id.csv
+        └── crosswalk-unknown-control.csv
 ```
 
 ## Quick start
@@ -111,7 +121,7 @@ It also generates:
 - `build/control-dashboard/control-status-dashboard.md`
 - `build/control-dashboard/control-status-dashboard.html`
 
-The GitHub Actions workflow [`validate-and-dashboard.yml`](.github/workflows/validate-and-dashboard.yml) is the single CI validation path. It runs `scripts/validate_repository.py` on push, pull request, and manual dispatch, publishes the generated dashboard to the job summary, and uploads it as a workflow artifact. All CSV schema, status value, and duplicate ID checks live in the Python validator so there is one source of truth.
+The GitHub Actions workflow [`validate-and-dashboard.yml`](.github/workflows/validate-and-dashboard.yml) is the single CI validation path. It runs the validator test suite (`python -m unittest discover -s tests`) and `scripts/validate_repository.py` on push, pull request, and manual dispatch, publishes the generated dashboard to the job summary, and uploads it as a workflow artifact. All CSV schema, status value, and duplicate ID checks live in the Python validator so there is one source of truth.
 
 Before running the scripts, check [`docs/script-readiness-matrix.md`](docs/script-readiness-matrix.md) for per-script maturity and operator notes.
 
