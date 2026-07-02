@@ -19,6 +19,7 @@ This document separates working repository capability from planned or partially 
 | Policy and register templates | Working | Templates are present for SoA, risk register, policies, evidence collection, and audit readiness. |
 | Manual evidence guidance | Working | `docs/manual-evidence-playbook.md` explains how to evidence controls that cannot be proven safely through Microsoft Graph. |
 | Script usage examples | Working | `docs/script-usage-examples.md` provides ready-to-run examples and troubleshooting notes. |
+| Auditor workflow | Working | `docs/auditor-workflow.md` covers audit scope, evidence requests, quality review, auditor packs, gap logs, remediation, and post-audit closeout. |
 
 ## Control guide coverage
 
@@ -97,6 +98,7 @@ See [`manual-evidence-playbook.md`](manual-evidence-playbook.md) for collection 
 - Permissions matrix added at `docs/permissions-matrix.md`.
 - Script usage examples added at `docs/script-usage-examples.md`.
 - Manual evidence boundaries added at `docs/manual-evidence-playbook.md`.
+- Auditor workflow added at `docs/auditor-workflow.md`.
 
 ## Contributor rule
 
