@@ -9,7 +9,7 @@ Many ISO 27001 resources explain what the control expects, but not how a securit
 Use this repository when you need to:
 
 - Convert high-level Annex A control language into real implementation actions.
-- Build a reusable evidence pack for internal audit, external audit, client assurance, or certification readiness.
+- Build a reusable evidence pack for audits, assurance reviews, or certification readiness.
 - Align security operations, Microsoft 365 hardening, Azure monitoring, endpoint controls, and policy governance to ISO 27001 outcomes.
 - Create a repeatable control-owner workflow for evidence collection and remediation tracking.
 - Cross-map ISO 27001 controls to NIST CSF 2.0 and Cyber Essentials themes.
@@ -45,6 +45,7 @@ To improve discoverability, apply the following topics to this repository via th
 │       └── validate-and-dashboard.yml
 ├── docs/
 │   ├── IMPLEMENTATION_STATUS.md
+│   ├── auditor-workflow.md
 │   ├── control-mapping-matrix.csv
 │   ├── evidence-collection-guide.md
 │   ├── manual-evidence-playbook.md
@@ -56,40 +57,7 @@ To improve discoverability, apply the following topics to this repository via th
 │   ├── framework-crosswalk.md
 │   ├── permissions-matrix.md
 │   ├── controls/
-│   │   ├── _TEMPLATE.md
-│   │   ├── A.5.1-policies-for-information-security.md
-│   │   ├── A.5.2-information-security-roles-and-responsibilities.md
-│   │   ├── A.5.9-inventory-of-assets.md
-│   │   ├── A.5.15-access-control.md
-│   │   ├── A.5.16-identity-management.md
-│   │   ├── A.5.17-authentication-information.md
-│   │   ├── A.5.18-access-rights.md
-│   │   ├── A.5.23-information-security-for-use-of-cloud-services.md
-│   │   ├── A.5.24-incident-management-planning.md
-│   │   ├── A.5.25-assessment-and-decision-on-information-security-events.md
-│   │   ├── A.5.28-collection-of-evidence.md
-│   │   ├── A.6.1-screening.md
-│   │   ├── A.6.2-terms-and-conditions-of-employment.md
-│   │   ├── A.6.3-security-awareness-training.md
-│   │   ├── A.6.5-responsibilities-after-termination-or-change-of-employment.md
-│   │   ├── A.6.6-confidentiality-or-non-disclosure-agreements.md
-│   │   ├── A.7.4-physical-security-monitoring.md
-│   │   ├── A.8.1-user-endpoint-devices.md
-│   │   ├── A.8.2-privileged-access-rights.md
-│   │   ├── A.8.5-secure-authentication.md
-│   │   ├── A.8.7-protection-against-malware.md
-│   │   ├── A.8.8-management-of-technical-vulnerabilities.md
-│   │   ├── A.8.9-configuration-management.md
-│   │   ├── A.8.12-data-leakage-prevention.md
-│   │   ├── A.8.15-logging-and-monitoring.md
-│   │   ├── A.8.16-monitoring-activities.md
-│   │   ├── A.8.20-networks-security.md
-│   │   ├── A.8.23-web-filtering.md
-│   │   ├── A.8.24-use-of-cryptography.md
-│   │   ├── A.8.28-secure-coding.md
-│   │   └── A.8.32-change-management.md
 │   ├── crosswalks/
-│   │   └── iso27001-nist-csf2-cyber-essentials.csv
 │   ├── dashboard/
 │   ├── examples/
 │   ├── isms-policy-templates/
@@ -111,12 +79,13 @@ To improve discoverability, apply the following topics to this repository via th
 2. Review [`docs/control-mapping-matrix.csv`](docs/control-mapping-matrix.csv). Filter by control owner, technology area, implementation status, related framework mapping, or evidence example to prioritise your workload.
 3. Use [`docs/evidence-collection-guide.md`](docs/evidence-collection-guide.md) to collect screenshots, exports, logs, policy documents, and ticket references.
 4. Use [`docs/manual-evidence-playbook.md`](docs/manual-evidence-playbook.md) for controls whose evidence lives outside Microsoft Graph or requires HR, ITSM, supplier, facilities, vulnerability, or change-management evidence.
-5. Refer to the per-control guides in [`docs/controls/`](docs/controls/) for detailed implementation notes, evidence checklists, and audit questions for individual Annex A controls.
-6. Copy [`docs/statement-of-applicability-template.md`](docs/statement-of-applicability-template.md) into your ISMS evidence folder and complete the applicability and justification fields.
-7. Use [`docs/risk-register-template.md`](docs/risk-register-template.md) or [`docs/templates/risk-register-template.csv`](docs/templates/risk-register-template.csv) to document, score, and track information security risks.
-8. Adapt the policy templates in [`docs/isms-policy-templates/`](docs/isms-policy-templates/) to your organisation's context.
-9. Run through [`docs/audit-readiness-checklist.md`](docs/audit-readiness-checklist.md) before internal audit, stage 1, stage 2, or surveillance audit activity.
-10. Use [`docs/framework-crosswalk.md`](docs/framework-crosswalk.md) or [`docs/crosswalks/iso27001-nist-csf2-cyber-essentials.csv`](docs/crosswalks/iso27001-nist-csf2-cyber-essentials.csv) if you are aligning ISO 27001 with NIST CSF 2.0 or Cyber Essentials.
+5. Use [`docs/auditor-workflow.md`](docs/auditor-workflow.md) to plan audit scope, evidence requests, quality review, auditor packs, and post-audit remediation.
+6. Refer to the per-control guides in [`docs/controls/`](docs/controls/) for detailed implementation notes, evidence checklists, and audit questions for individual Annex A controls.
+7. Copy [`docs/statement-of-applicability-template.md`](docs/statement-of-applicability-template.md) into your ISMS evidence folder and complete the applicability and justification fields.
+8. Use [`docs/risk-register-template.md`](docs/risk-register-template.md) or [`docs/templates/risk-register-template.csv`](docs/templates/risk-register-template.csv) to document, score, and track information security risks.
+9. Adapt the policy templates in [`docs/isms-policy-templates/`](docs/isms-policy-templates/) to your organisation's context.
+10. Run through [`docs/audit-readiness-checklist.md`](docs/audit-readiness-checklist.md) before audit activity.
+11. Use [`docs/framework-crosswalk.md`](docs/framework-crosswalk.md) or [`docs/crosswalks/iso27001-nist-csf2-cyber-essentials.csv`](docs/crosswalks/iso27001-nist-csf2-cyber-essentials.csv) if you are aligning ISO 27001 with NIST CSF 2.0 or Cyber Essentials.
 
 ## Automation
 
@@ -157,7 +126,7 @@ Install-Module Microsoft.Graph -Scope CurrentUser
 ./scripts/m365/Export-M365Iso27001Evidence.ps1 -TenantId "<tenant-id-or-domain>" -OutputRoot ./evidence
 ```
 
-The script writes CSV/JSON outputs and an `M365_Evidence_Index.csv` file that labels each export with the relevant ISO 27001 control ID. Store exports securely and redact tenant or user details before sharing externally.
+The script writes CSV/JSON outputs and an `M365_Evidence_Index.csv` file that labels each export with the relevant ISO 27001 control ID. Store exports securely and redact tenant or user details before sharing.
 
 ## Suggested evidence naming convention
 
