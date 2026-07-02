@@ -12,6 +12,10 @@ The format follows the spirit of [Keep a Changelog](https://keepachangelog.com/e
 
 ### Added
 
+- `requirements.txt` recording that only the Python standard library is needed, with CI pinned to Python 3.12.
+- `.gitignore` excluding Python bytecode, local `build/` dashboard output, and local evidence exports.
+- GitHub issue templates (bug report, control guide or mapping request) and a pull request template based on the contributing checklist.
+- Committed sample dashboard under `docs/dashboard/` so the validator output is visible without a local run.
 - Per-control guide template at `docs/controls/_TEMPLATE.md` and new guides for A.5.9 inventory of assets, A.5.17 authentication information, A.5.24 incident management planning, A.8.1 user endpoint devices, and A.8.9 configuration management.
 - Permissions matrix at `docs/permissions-matrix.md` mapping each PowerShell script and function to its minimum Graph scopes and Entra roles.
 - Synthetic evidence examples under `docs/examples/` showing expected exporter output shapes without any real tenant data.

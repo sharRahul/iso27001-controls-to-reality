@@ -1,0 +1,4 @@
+# No third-party Python dependencies are required.
+# scripts/validate_repository.py and tests/ use only the Python standard library.
+# CI pins Python 3.12 (.github/workflows/validate-and-dashboard.yml); any Python 3.10+
+# interpreter works locally.
