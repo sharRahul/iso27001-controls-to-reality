@@ -71,12 +71,32 @@ def require_columns(path: Path, rows: list[dict[str, str]], required: Iterable[s
     return errors
 
 
+def require_exact_columns(path: Path, rows: list[dict[str, str]], required: list[str]) -> list[str]:
+    """Require the header row to match the expected schema exactly, including order."""
+    errors: list[str] = []
+    columns = list(rows[0].keys()) if rows else []
+    if columns == required:
+        return errors
+    for column in required:
+        if column not in columns:
+            errors.append(f"{path}: missing required column '{column}'")
+    for column in columns:
+        if column not in required:
+            errors.append(f"{path}: unexpected column '{column}'")
+    if not errors:
+        errors.append(
+            f"{path}: column order does not match the expected schema "
+            f"(expected: {','.join(required)})"
+        )
+    return errors
+
+
 def validate_matrix(rows: list[dict[str, str]]) -> list[str]:
     errors: list[str] = []
     if not rows:
         return [f"{MATRIX_PATH}: no data rows found"]
 
-    errors.extend(require_columns(MATRIX_PATH, rows, REQUIRED_MATRIX_COLUMNS))
+    errors.extend(require_exact_columns(MATRIX_PATH, rows, REQUIRED_MATRIX_COLUMNS))
 
     seen_ids: set[str] = set()
     for index, row in enumerate(rows, start=2):

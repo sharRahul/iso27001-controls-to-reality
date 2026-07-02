@@ -27,6 +27,9 @@ jobs:
       - name: Validate repository data
         run: python scripts/validate_repository.py --dashboard-dir build/control-dashboard
 
+      - name: Publish dashboard to job summary
+        run: cat build/control-dashboard/control-status-dashboard.md >> "$GITHUB_STEP_SUMMARY"
+
       - name: Upload dashboard artifact
         uses: actions/upload-artifact@v4
         with:

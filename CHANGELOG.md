@@ -6,6 +6,10 @@ The format follows the spirit of [Keep a Changelog](https://keepachangelog.com/e
 
 ## [Unreleased]
 
+### Removed
+
+- Redundant `validate-controls.yml` workflow. Its checks (exact CSV header schema, implementation status values, duplicate control IDs, status summary) are now covered by `scripts/validate_repository.py` and the `validate-and-dashboard.yml` workflow, which is the single CI validation path.
+
 ### Added
 
 - Audit-ready documentation stack.

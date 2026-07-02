@@ -97,7 +97,8 @@ python scripts/validate_repository.py --dashboard-dir build/control-dashboard
 
 This checks:
 
-- Required CSV columns for the committed matrix and crosswalk schemas.
+- Exact header schema (including column order) for the committed control matrix.
+- Required CSV columns for the crosswalk schema.
 - ISO 27001 Annex A control ID format.
 - Duplicate control IDs.
 - Supported implementation status values.
@@ -108,7 +109,9 @@ It also generates:
 - `build/control-dashboard/control-status-dashboard.md`
 - `build/control-dashboard/control-status-dashboard.html`
 
-The GitHub Actions workflow [`validate-and-dashboard.yml`](.github/workflows/validate-and-dashboard.yml) runs the same validation on push, pull request, and manual dispatch, then uploads the dashboard as a workflow artifact.
+The GitHub Actions workflow [`validate-and-dashboard.yml`](.github/workflows/validate-and-dashboard.yml) is the single CI validation path. It runs `scripts/validate_repository.py` on push, pull request, and manual dispatch, publishes the generated dashboard to the job summary, and uploads it as a workflow artifact. All CSV schema, status value, and duplicate ID checks live in the Python validator so there is one source of truth.
+
+Before running the scripts, check [`docs/script-readiness-matrix.md`](docs/script-readiness-matrix.md) for per-script maturity and operator notes.
 
 ### Export Microsoft 365 evidence
 
