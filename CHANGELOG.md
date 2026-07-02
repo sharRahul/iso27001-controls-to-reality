@@ -28,6 +28,9 @@ The format follows the spirit of [Keep a Changelog](https://keepachangelog.com/e
 
 ### Changed
 
+- Consolidated policy templates: `docs/isms-policy-templates/` is now the canonical policy template directory. The overlapping files under `docs/policies/` were converted to pointer notes after their unique minimum evidence tables and the A.5.27 mapping were merged into the canonical templates.
+- Clarified that `docs/risk-register-template.md` is the narrative risk register guide and `docs/templates/risk-register-template.csv` is the importable CSV register.
+- Added `docs/script-readiness-matrix.md` and the templates directory README to the README repository structure tree so the tree matches the files on disk.
 - Expanded README into a professional project storefront with quick start guidance and repository structure.
 - Updated README automation guidance for local validation, generated dashboards, and Microsoft 365 evidence exports.
 

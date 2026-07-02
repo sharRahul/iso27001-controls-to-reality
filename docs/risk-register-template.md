@@ -1,5 +1,7 @@
 # Risk Register Template — ISO 27001:2022
 
+> **Note:** This file is the narrative risk register guide with worked examples and scoring guidance. For a blank register you can import directly into Excel or a GRC tool, use [`docs/templates/risk-register-template.csv`](templates/risk-register-template.csv).
+
 This template supports the information security risk assessment and treatment process required by ISO/IEC 27001:2022 clauses 6.1.2 and 6.1.3. It is pre-populated with five example risks relevant to Microsoft 365 and cloud-hybrid environments. Replace or supplement these examples with risks identified during your organisation's own risk assessment.
 
 ---

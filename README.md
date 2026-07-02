@@ -43,6 +43,7 @@ To improve discoverability, apply the following topics to this repository via th
 │   ├── IMPLEMENTATION_STATUS.md
 │   ├── control-mapping-matrix.csv
 │   ├── evidence-collection-guide.md
+│   ├── script-readiness-matrix.md
 │   ├── statement-of-applicability-template.md
 │   ├── audit-readiness-checklist.md
 │   ├── risk-register-template.md
@@ -61,10 +62,11 @@ To improve discoverability, apply the following topics to this repository via th
 │   │   ├── acceptable-use-policy.md
 │   │   ├── access-control-policy.md
 │   │   └── incident-response-policy.md
-│   ├── policies/
+│   ├── policies/            (pointer notes to isms-policy-templates/)
 │   │   ├── access-control-policy-template.md
 │   │   └── incident-response-policy-template.md
 │   └── templates/
+│       ├── README.md
 │       └── risk-register-template.csv
 └── scripts/
     ├── Get-ISO27001Evidence.ps1
@@ -80,8 +82,8 @@ To improve discoverability, apply the following topics to this repository via th
 3. Use [`docs/evidence-collection-guide.md`](docs/evidence-collection-guide.md) to collect screenshots, exports, logs, policy documents, and ticket references.
 4. Refer to the per-control guides in [`docs/controls/`](docs/controls/) for detailed implementation notes, evidence checklists, and audit questions for individual Annex A controls.
 5. Copy [`docs/statement-of-applicability-template.md`](docs/statement-of-applicability-template.md) into your ISMS evidence folder and complete the applicability and justification fields.
-6. Use [`docs/risk-register-template.md`](docs/risk-register-template.md) or [`docs/templates/risk-register-template.csv`](docs/templates/risk-register-template.csv) to document, score, and track information security risks.
-7. Adapt the policy templates in [`docs/isms-policy-templates/`](docs/isms-policy-templates/) or [`docs/policies/`](docs/policies/) to your organisation's context.
+6. Use [`docs/risk-register-template.md`](docs/risk-register-template.md) (narrative guide with scoring guidance and worked examples) or [`docs/templates/risk-register-template.csv`](docs/templates/risk-register-template.csv) (importable CSV) to document, score, and track information security risks.
+7. Adapt the policy templates in [`docs/isms-policy-templates/`](docs/isms-policy-templates/) to your organisation's context.
 8. Run through [`docs/audit-readiness-checklist.md`](docs/audit-readiness-checklist.md) before internal audit, stage 1, stage 2, or surveillance audit activity.
 9. Use [`docs/framework-crosswalk.md`](docs/framework-crosswalk.md) or [`docs/crosswalks/iso27001-nist-csf2-cyber-essentials.csv`](docs/crosswalks/iso27001-nist-csf2-cyber-essentials.csv) if you are aligning ISO 27001 with NIST CSF 2.0 or Cyber Essentials.
 
