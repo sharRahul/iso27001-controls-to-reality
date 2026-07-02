@@ -48,16 +48,28 @@ To improve discoverability, apply the following topics to this repository via th
 │   ├── audit-readiness-checklist.md
 │   ├── risk-register-template.md
 │   ├── framework-crosswalk.md
+│   ├── permissions-matrix.md
 │   ├── controls/
+│   │   ├── _TEMPLATE.md
+│   │   ├── A.5.9-inventory-of-assets.md
 │   │   ├── A.5.15-access-control.md
 │   │   ├── A.5.16-identity-management.md
+│   │   ├── A.5.17-authentication-information.md
+│   │   ├── A.5.24-incident-management-planning.md
 │   │   ├── A.6.3-security-awareness-training.md
+│   │   ├── A.8.1-user-endpoint-devices.md
 │   │   ├── A.8.2-privileged-access-rights.md
 │   │   ├── A.8.5-secure-authentication.md
 │   │   ├── A.8.7-protection-against-malware.md
+│   │   ├── A.8.9-configuration-management.md
 │   │   └── A.8.15-logging-and-monitoring.md
 │   ├── crosswalks/
 │   │   └── iso27001-nist-csf2-cyber-essentials.csv
+│   ├── examples/
+│   │   ├── README.md
+│   │   ├── A.8.5_MFARegistrationDetails.sample.csv
+│   │   ├── A.8.15_RecentSignIns.sample.csv
+│   │   └── M365_Evidence_Index.sample.csv
 │   ├── isms-policy-templates/
 │   │   ├── acceptable-use-policy.md
 │   │   ├── access-control-policy.md
@@ -123,7 +135,7 @@ It also generates:
 
 The GitHub Actions workflow [`validate-and-dashboard.yml`](.github/workflows/validate-and-dashboard.yml) is the single CI validation path. It runs the validator test suite (`python -m unittest discover -s tests`) and `scripts/validate_repository.py` on push, pull request, and manual dispatch, publishes the generated dashboard to the job summary, and uploads it as a workflow artifact. All CSV schema, status value, and duplicate ID checks live in the Python validator so there is one source of truth.
 
-Before running the scripts, check [`docs/script-readiness-matrix.md`](docs/script-readiness-matrix.md) for per-script maturity and operator notes.
+Before running the scripts, check [`docs/script-readiness-matrix.md`](docs/script-readiness-matrix.md) for per-script maturity and operator notes, and [`docs/permissions-matrix.md`](docs/permissions-matrix.md) for the minimum Graph scopes and Entra roles each script needs. Synthetic example outputs live in [`docs/examples/`](docs/examples/) so you can see the expected shape of each export without connecting to a tenant.
 
 ### Export Microsoft 365 evidence
 

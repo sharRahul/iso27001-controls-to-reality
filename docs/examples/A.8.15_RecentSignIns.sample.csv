@@ -1,0 +1,6 @@
+CreatedDateTime,UserPrincipalName,AppDisplayName,ClientAppUsed,IpAddress,ConditionalAccess,RiskDetail,StatusErrorCode,StatusFailureReason
+2026-05-13T08:02:11Z,alex.taylor@contoso.example.com,Microsoft 365 Portal,Browser,203.0.113.10,success,none,0,
+2026-05-13T08:05:42Z,sam.morgan@contoso.example.com,Azure Portal,Browser,203.0.113.24,success,none,0,
+2026-05-13T08:17:03Z,jamie.patel@contoso.example.com,Exchange Online,Mobile Apps and Desktop clients,198.51.100.7,success,none,0,
+2026-05-13T09:44:56Z,chris.evans@contoso.example.com,Microsoft Teams,Browser,192.0.2.55,failure,none,50126,Error validating credentials due to invalid username or password.
+2026-05-13T09:45:31Z,chris.evans@contoso.example.com,Microsoft Teams,Browser,192.0.2.55,success,none,0,

@@ -22,9 +22,9 @@ Use this matrix before running repository scripts. Prefer least privilege, local
 ## Backlog
 
 - Add per-script example commands.
-- Add minimum role and permission details.
-- Add synthetic evidence examples.
 
 ## Completed
 
 - Fixture-based validator tests live in `tests/` and run in CI.
+- Minimum role and permission details are recorded in [`permissions-matrix.md`](permissions-matrix.md).
+- Synthetic evidence examples live in [`examples/`](examples/).

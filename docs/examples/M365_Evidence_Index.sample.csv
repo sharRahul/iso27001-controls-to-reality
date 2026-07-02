@@ -1,0 +1,9 @@
+ControlId,EvidenceName,FileName,Source,CollectionDateUtc,Description
+A.8.5,MFA registration details,A.8.5_MFARegistrationDetails.csv,Microsoft Graph reports/authenticationMethods/userRegistrationDetails,2026-05-13T10:00:00.0000000Z,Shows MFA capability and registration posture for users.
+A.8.5,Conditional Access policies,A.8.5_ConditionalAccessPolicies.json,Microsoft Graph identity/conditionalAccess/policies,2026-05-13T10:00:05.0000000Z,Exports Conditional Access policy configuration for authentication evidence.
+A.5.15,Conditional Access policies,A.8.5_ConditionalAccessPolicies.json,Microsoft Graph identity/conditionalAccess/policies,2026-05-13T10:00:05.0000000Z,Supports access control evidence for policy-based access restrictions.
+A.8.2,Privileged role assignments,A.8.2_PrivilegedRoleAssignments.csv,Microsoft Graph roleManagement/directory/roleAssignments,2026-05-13T10:00:12.0000000Z,Shows directory role assignments for privileged access review.
+A.8.15,Recent sign-ins,A.8.15_RecentSignIns.csv,Microsoft Graph auditLogs/signIns,2026-05-13T10:00:20.0000000Z,Recent sign-in event sample for logging evidence.
+A.8.16,Recent sign-ins,A.8.15_RecentSignIns.csv,Microsoft Graph auditLogs/signIns,2026-05-13T10:00:20.0000000Z,Recent sign-in event sample for monitoring and triage evidence.
+A.8.15,Directory audit events,A.8.15_DirectoryAuditEvents.json,Microsoft Graph auditLogs/directoryAudits,2026-05-13T10:00:31.0000000Z,Recent directory audit event sample for logging evidence.
+A.8.16,Directory audit events,A.8.15_DirectoryAuditEvents.json,Microsoft Graph auditLogs/directoryAudits,2026-05-13T10:00:31.0000000Z,Recent directory audit event sample for monitoring evidence.

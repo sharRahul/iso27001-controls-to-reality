@@ -12,6 +12,9 @@ The format follows the spirit of [Keep a Changelog](https://keepachangelog.com/e
 
 ### Added
 
+- Per-control guide template at `docs/controls/_TEMPLATE.md` and new guides for A.5.9 inventory of assets, A.5.17 authentication information, A.5.24 incident management planning, A.8.1 user endpoint devices, and A.8.9 configuration management.
+- Permissions matrix at `docs/permissions-matrix.md` mapping each PowerShell script and function to its minimum Graph scopes and Entra roles.
+- Synthetic evidence examples under `docs/examples/` showing expected exporter output shapes without any real tenant data.
 - Read-only evidence functions in `Get-ISO27001Evidence.ps1` for A.5.18 (access review definitions), A.8.1 (Intune device compliance), A.8.12 (Purview DLP policy configuration), and A.8.16 (Identity Protection risk detections). The new functions default to report-only and write files only when `-OutputPath` is supplied explicitly. A.8.8, A.8.23, A.8.24, and A.8.32 remain manual by design and the implementation status file records why.
 - Fixture-based validator tests under `tests/` (standard library `unittest`), covering valid data, a missing column, an unexpected column, an invalid implementation status, a duplicate control ID, and a crosswalk row referencing a control absent from the matrix. The tests run in CI before validation.
 - `--matrix` and `--crosswalk` arguments on `scripts/validate_repository.py` so the validator can be pointed at fixture files; defaults are unchanged.
